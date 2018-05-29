@@ -139,6 +139,13 @@ const (
 	ExtendLast Extend = C.VIPS_EXTEND_LAST
 )
 
+type BlendMode int
+
+const (
+	BlendModeOver BlendMode = C.VIPS_BLEND_MODE_OVER
+	BlendModeAdd  BlendMode = C.VIPS_BLEND_MODE_ADD
+)
+
 // WatermarkFont defines the default watermark font to be used.
 var WatermarkFont = "sans 10"
 
@@ -164,10 +171,11 @@ type Watermark struct {
 
 // WatermarkImage represents the image-based watermark supported options.
 type WatermarkImage struct {
-	Left    int
-	Top     int
-	Buf     []byte
-	Opacity float32
+	Left      int
+	Top       int
+	Buf       []byte
+	Opacity   float32
+	BlendMode BlendMode
 }
 
 // GaussianBlur represents the gaussian image transformation values.

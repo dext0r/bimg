@@ -361,6 +361,10 @@ func watermarkImageWithAnotherImage(image *C.VipsImage, w WatermarkImage) (*C.Vi
 		w.Opacity = 1.0
 	}
 
+	if w.BlendMode == 0 {
+		w.BlendMode = BlendModeOver
+	}
+
 	image, err := vipsDrawWatermark(image, w)
 
 	if err != nil {
