@@ -491,26 +491,29 @@ vips_add_band(VipsImage *in, VipsImage **out, double c) {
 int
 vips_watermark_image(VipsImage *in, VipsImage *watermark, VipsImage **out, WatermarkImageOptions *o) {
 	VipsImage *base = vips_image_new();
-	VipsImage **t = (VipsImage **) vips_object_local_array(VIPS_OBJECT(base), 3);
+	VipsImage **t = (VipsImage **) vips_object_local_array(VIPS_OBJECT(base), 5);
+
+	t[0] = in;
+	t[1] = watermark;
 
 	// TODO: watermark opacity support
 	if (
-		vips_extract_area(in, &t[0], o->Left, o->Top, watermark->Xsize, watermark->Ysize, NULL) ||
-		vips_composite2(t[0], watermark, &t[1], o->BlendMode, NULL)) {
+		vips_extract_area(t[0], &t[2], o->Left, o->Top, watermark->Xsize, watermark->Ysize, NULL) ||
+		vips_composite2(t[2], t[1], &t[3], o->BlendMode, NULL)) {
 			g_object_unref(base);
 			return 1;
 	}
 
-	if (has_alpha_channel(watermark) && !has_alpha_channel(in)) {
-		if (vips_flatten(t[1], &t[2], NULL)) {
+	if (has_alpha_channel(t[1]) && !has_alpha_channel(t[0])) {
+		if (vips_flatten(t[3], &t[4], NULL)) {
 			g_object_unref(base);
 			return 1;
 		}
 	} else {
-		t[2] = t[1];
+		t[4] = t[3];
 	}
 
-	if (vips_insert(in, t[2], out, o->Left, o->Top, NULL)) {
+	if (vips_insert(t[0], t[4], out, o->Left, o->Top, NULL)) {
 		g_object_unref(base);
 		return 1;
 	}
